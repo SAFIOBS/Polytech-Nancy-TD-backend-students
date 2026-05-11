@@ -20,7 +20,7 @@ import static java.util.Objects.nonNull;
  */
 public class Application {
 
-    private static final Logger log = LoggerFactory.getLogger(Application.class);
+    private static  final Logger log = LoggerFactory.getLogger(Application.class);
     private static final Pattern ID_PATH = Pattern.compile("^/tasks/([0-9]+)$");
     private static final TaskDao dao = new TaskDao();
 
