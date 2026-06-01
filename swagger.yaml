@@ -1,23 +1,40 @@
 openapi: 3.0.3
 info:
-    title: TODO API
+    title: Todo App API - Polytech Nancy TD1
+    description: API REST minimale pour la gestion d'une Todo List
     version: 1.0.0
-    description: >
-        API de gestion d'une TODO List.
 servers:
-    -   url: http://localhost:8080
-        description: Serveur local de développement
-
-tags:
-    -   name: tasks
-        description: Opérations sur les tâches
+    - url: http://localhost:8080
+      description: Serveur local
 
 paths:
     /tasks:
+        get:
+            summary: Récupérer l'ensemble des tâches
+            description: Retourne la liste des tâches, avec filtrage possible sur le statut.
+            parameters:
+                - name: todo-only
+                  in: query
+                  description: Si vrai, retourne uniquement les tâches à réaliser (done = false)
+                  required: false
+                  schema:
+                      type: boolean
+                      default: false
+            responses:
+                '200':
+                    description: Liste des tâches récupérée avec succès
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Task'
+                '204':
+                    description: Aucune tâche trouvée (Pas de contenu)
+
         post:
-            tags: [ tasks ]
-            summary: Créer une tâche
-            operationId: createTask
+            summary: Créer une nouvelle tâche
+            description: Ajoute une tâche à la liste en mémoire.
             requestBody:
                 required: true
                 content:
@@ -29,59 +46,88 @@ paths:
                     description: Tâche créée avec succès
                     headers:
                         Location:
-                            description: URL de la ressource créée
+                            description: URL de la tâche créée
                             schema:
                                 type: string
-                                example: /tasks/1
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Task'
 
     /tasks/{id}:
-        parameters:
-            -   in: path
-                name: id
-                required: true
-                description: Identifiant numérique de la tâche
-                schema:
-                    type: integer
-                    minimum: 1
         get:
-            tags: [ tasks ]
-            summary: Récupérer une tâche
-            description: Récupérer une tâche par son identifiant
-            operationId: getTaskById
+            summary: Récupérer une tâche par son ID
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: Identifiant unique de la tâche
+                  schema:
+                      type: integer
             responses:
                 '200':
-                    description: Tâche trouvée avec succès
+                    description: Tâche trouvée
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Task'
                 '404':
-                    description: Tâche non trouvée
+                    description: Tâche introuvable
+
+        put:
+            summary: Modifier une tâche existante
+            description: Modifie l'intégralité d'une tâche à partir de son ID.
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: Identifiant unique de la tâche à modifier
+                  schema:
+                      type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Task'
+            responses:
+                '204':
+                    description: Tâche modifiée avec succès (aucun contenu renvoyé)
+                '404':
+                    description: Tâche introuvable
+
+        delete:
+            summary: Supprimer une tâche par son ID
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  description: Identifiant unique de la tâche à supprimer
+                  schema:
+                      type: integer
+            responses:
+                '204':
+                    description: Tâche supprimée avec succès (aucun contenu renvoyé)
+                '404':
+                    description: Tâche introuvable
+
 components:
     schemas:
         Task:
             type: object
-            description: Représentation d'une tâche
+            required:
+                - title
+                - description
             properties:
                 id:
                     type: integer
                     example: 1
                 title:
                     type: string
-                    nullable: true
-                    example: Acheter du lait
+                    example: "Réviser DS de maths"
                 description:
                     type: string
-                    nullable: true
-                    example: 2L demi-écrémé
+                    example: "Séries numériques et probabilités."
                 done:
                     type: boolean
-                    nullable: true
                     example: false
-            required:
-                - id
-                - title

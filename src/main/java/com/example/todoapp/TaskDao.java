@@ -1,6 +1,8 @@
 package com.example.todoapp;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,5 +36,32 @@ public class TaskDao {
      */
     public Optional<Task> findById(int id) {
         return Optional.ofNullable(storage.get(id));
+    }
+
+    /**
+     * Retrieve all {@link Task} models.
+     * @return List of all tasks.
+     */
+    public List<Task> findAll() {
+        return new ArrayList<>(storage.values());
+    }
+
+    /**
+     * Delete a {@link Task} by its id.
+     * @param id identifier of the {@link Task}.
+     */
+    public void deleteById(int id) {
+        storage.remove(id);
+    }
+
+    /**
+     * Update an existing {@link Task}.
+     * @param id identifier of the task to update.
+     * @param updatedTask new task data.
+     */
+    public void update(int id, Task updatedTask) {
+        // On s'assure que l'objet enregistré a bien l'ID passé dans l'URL
+        Task taskToSave = new Task(id, updatedTask.title(), updatedTask.description(), updatedTask.done());
+        storage.put(id, taskToSave);
     }
 }
